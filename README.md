@@ -1,7 +1,7 @@
 # Balenalib Systemd Example
 
 In January 2019, [balena](https://balena.io) released a set of 26K new base images ([read more](https://www.balena.io/blog/new-year-new-balena-base-images/)).
-The new images does not contain `systemd` built-in, 
+The new images do not have `systemd` built-in. 
 
 This is an example showing how to add it to a new or existing project.
 
