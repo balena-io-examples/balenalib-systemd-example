@@ -24,6 +24,11 @@ function signal_handler()
 	kill "$pid"
 }
 
+# Test if a version is greater than another
+function version_gt() {
+    test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"
+}
+
 function start_udev()
 {
 	if [ "$UDEV" == "on" ]; then
@@ -85,7 +90,13 @@ function init_systemd()
 	EOF
 
  	sleep infinity &
-	exec env DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket /sbin/init quiet systemd.show_status=0
+
+	if version_gt ${BALENA_HOST_OS_VERSION##* } 2.41.1; then
+		exec env DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket /sbin/init quiet systemd.show_status=0
+	else
+		# Need to use legacy cgroup controller older os versions. More information here https://github.com/balena-os/meta-balena/issues/1645
+		exec env DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket /sbin/init quiet systemd.show_status=0 systemd.legacy_systemd_cgroup_controller
+	fi
 }
 
  function init_non_systemd()
